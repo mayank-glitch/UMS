@@ -1,0 +1,338 @@
+openapi: 3.0.2
+
+info:
+  title: UMS
+  description: "User Management System"
+  termsOfService: http://swagger.io/terms/
+  contact:
+    email: mayank.jain2@delhivery.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 0.0.1-SNAPSHOT
+  
+servers:
+- url: https://localhost:8080/v2
+
+tags:
+- name: user
+  description: Operations about user
+  
+paths:
+
+  /user:
+  
+    post:
+      tags:
+      - user
+      summary: Create user
+      description: Create user functionality
+      operationId: createUser
+      requestBody:
+        description: Created user object
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+        required: true
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Response'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/UserResponse'
+                      
+        404:
+          $ref: '#/components/responses/NotFound' 
+        400:
+          $ref: '#/components/responses/BadRequest' 
+        500:
+          $ref: '#/components/responses/InternalServerError'
+          
+  /user/{userId}:
+  
+    get:
+      tags:
+      - user
+      summary: Get user by user Id
+      operationId: getUserById
+      parameters:
+      - name: userId
+        in: path
+        description: 'The user that needs to be fetched. Use 123 for testing. '
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Response'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/UserResponse'
+        404:
+          $ref: '#/components/responses/NotFound' 
+        400:
+          $ref: '#/components/responses/BadRequest' 
+        500:
+          $ref: '#/components/responses/InternalServerError'
+          
+    put:
+      tags:
+      - user
+      summary: Update user
+      description: This Api is used for updating user, can only be done by the logged in user. New user version will be created, without modifying the existing one.
+      operationId: updateUser
+      parameters:
+      - name: userId
+        in: path
+        description: name that need to be updated
+        required: true
+        schema:
+          type: string
+      requestBody:
+        description: Updated user object
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+        required: true
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Response'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/UserResponse'
+        404:
+          $ref: '#/components/responses/NotFound' 
+        400:
+          $ref: '#/components/responses/BadRequest' 
+        500:
+          $ref: '#/components/responses/InternalServerError'
+          
+    delete:
+      tags:
+      - user
+      summary: Delete user
+      description: This can only be done by the logged in user.
+      operationId: deleteUser
+      parameters:
+      - name: userId
+        in: path
+        description: The name that needs to be deleted
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Response'
+        404:
+          $ref: '#/components/responses/NotFound' 
+        400:
+          $ref: '#/components/responses/BadRequest' 
+        500:
+          $ref: '#/components/responses/InternalServerError'
+    
+  /user/{userId}/history:
+  
+    get:
+      tags:
+      - user
+      summary: Get user history by user Id
+      operationId: getUserHistoryById
+      parameters:
+      - in: path
+        name: userId
+        description: 'The user history that needs to be fetched. Use 123 for testing. '
+        required: true
+        schema:
+          type: string
+      - in: query
+        name: pageNo
+        description: 'Number of the page which should be returned'
+        required: false
+        schema:
+          type: integer
+          default: 0
+      - in: query
+        name: pageSize
+        description: 'Size of the page which should be returned'
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 50
+          default: 10
+        required: false
+      responses:
+        200:
+          description: successful operation, returns list of versions of a user.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PageResponse'
+                  - type: object
+                    properties:
+                      list: 
+                          type: array
+                          items: 
+                            $ref: '#/components/schemas/UserHistoryResponse'
+        404:
+          $ref: '#/components/responses/NotFound' 
+        400:
+          $ref: '#/components/responses/BadRequest' 
+        500:
+          $ref: '#/components/responses/InternalServerError'
+                
+                
+#Description of common properties
+components:
+
+  responses:
+    NotFound:
+      description: User not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:  
+                type: string
+              reason: 
+                type: string
+              success:
+                type: boolean
+                default: false
+    BadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:  
+                type: string
+              reason: 
+                type: string
+              success:
+                type: boolean
+                default: false
+    InternalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:  
+                type: string
+              reason: 
+                type: string
+              success:
+                type: boolean
+                default: false
+            
+
+  schemas:
+    UserRequest:
+        type: object
+        properties:
+          username:
+            type: string
+          firstName:
+            type: string
+          lastName:
+            type: string
+          email:
+            type: string
+          password:
+            type: string
+          phone:
+            type: string
+        required:
+          - username
+          - firstName
+          - lastName
+          - email
+          - password
+          - phone
+  
+    Response:
+        type: object
+        properties:
+          status:  
+            type: string
+          reason: 
+            type: string
+          success:
+            type: boolean
+            default: true
+            
+    UserResponse:
+      type: object
+      properties:
+        id:
+         type: string
+         format: uuid
+        username:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        password:
+          type: string
+            
+            
+    PageResponse:
+      type: object
+      allOf: 
+        - $ref: '#/components/schemas/Response'
+      properties:
+        totalPages:
+          type: integer
+        totalCount:
+          type: integer
+        pageSize:
+          type: integer
+        pageNumber:
+          type: integer
+          
+    UserHistoryResponse:
+      type: object
+      properties:
+        userBaseResponse:
+            $ref: '#/components/schemas/UserResponse'
+        version:
+          type: integer
+          
+          
+
+        
+      

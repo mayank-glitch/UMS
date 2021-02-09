@@ -1,3 +1,9 @@
+### Important file, not to be ignored ###
+!**/src/main/**
+!**/src/test/**
+
+
+
 # Compiled class file
 *.class
 
@@ -21,3 +27,27 @@
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
+
+
+### IntelliJ hidden files ###
+.idea
+*.iws
+*.iml
+*.ipr
+out/
+
+### Gradle files ###
+.gradle/
+
+### build output dirs ###
+build/
+bin/
+
+### Log files ###
+*.log
+hs_err_pid*
+
+
+### VS Code ###
+.vscode/
+*.DS_Store
