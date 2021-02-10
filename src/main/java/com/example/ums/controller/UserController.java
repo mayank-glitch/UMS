@@ -4,6 +4,7 @@ import com.example.ums.model.*;
 import com.example.ums.service.UserService;
 import com.example.ums.util.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,8 +47,8 @@ public class UserController {
 
     @GetMapping(path = "/{userId}/history")
     public PageResponse<UserHistoryResponse> getUserHistory(@PathVariable(name = "userId") UUID userId,
-                                                            @RequestParam(name = "pageNo", required = false, defaultValue = "0") Integer pageNo,
-                                                            @RequestParam(name = "pageSize", required = false, defaultValue = "10") Integer pageSize){
-        return userService.getUserHistory(userId, pageNo, pageSize);
+                                                            @RequestBody CustomPageRequest request){
+        PageResponse<UserHistoryResponse> response = userService.getUserHistory(userId, request);
+        return response;
     }
 }

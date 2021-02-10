@@ -42,19 +42,36 @@ public class UserConverter {
         return userResponse;
     }
 
-    public static UserHistoryResponse convert(UserESEntity userESEntity){
+    public static UserHistoryResponse convertESToHistoryResponse(UserESEntity userESEntity){
         UserHistoryResponse userHistoryResponse = new UserHistoryResponse();
         if(userESEntity != null){
-            userHistoryResponse.setUserBaseResponse(convertES(userESEntity));
+            userHistoryResponse.setUserResponse(convertES(userESEntity));
             userHistoryResponse.setVersion(userESEntity.getVersion());
         }
         return userHistoryResponse;
     }
 
-    public static List<UserHistoryResponse> convert(List<UserESEntity> users){
+    public static UserHistoryResponse convertToHistoryResponse(UserEntity userEntity){
+        UserHistoryResponse userHistoryResponse = new UserHistoryResponse();
+        if(userEntity != null){
+            userHistoryResponse.setUserResponse(convert(userEntity));
+            userHistoryResponse.setVersion(userEntity.getVersion());
+        }
+        return userHistoryResponse;
+    }
+
+    public static List<UserHistoryResponse> convertListESToHistoryResponse(List<UserESEntity> users){
         List<UserHistoryResponse> userHistoryResponses = new ArrayList<>();
         if(CollectionUtils.isNotEmpty(users)){
-            users.forEach(userESEntity -> userHistoryResponses.add(convert(userESEntity)));
+            users.forEach(userESEntity -> userHistoryResponses.add(convertESToHistoryResponse(userESEntity)));
+        }
+        return userHistoryResponses;
+    }
+
+    public static List<UserHistoryResponse> convertListToHistoryResponse(List<UserEntity> users){
+        List<UserHistoryResponse> userHistoryResponses = new ArrayList<>();
+        if(CollectionUtils.isNotEmpty(users)){
+            users.forEach(userEntity -> userHistoryResponses.add(convertToHistoryResponse(userEntity)));
         }
         return userHistoryResponses;
     }

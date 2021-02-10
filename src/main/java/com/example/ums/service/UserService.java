@@ -1,9 +1,6 @@
 package com.example.ums.service;
 
-import com.example.ums.model.PageResponse;
-import com.example.ums.model.UserHistoryResponse;
-import com.example.ums.model.UserResponse;
-import com.example.ums.model.UserRequest;
+import com.example.ums.model.*;
 
 import java.util.UUID;
 
@@ -19,5 +16,5 @@ public interface UserService {
 
     void deleteUser(UUID userId);
 
-    PageResponse<UserHistoryResponse> getUserHistory(UUID id, int pageNo, int pageSize);
+    PageResponse<UserHistoryResponse> getUserHistory(UUID id, CustomPageRequest request);
 }

@@ -4,10 +4,7 @@ import com.example.ums.converter.UserConverter;
 import com.example.ums.entity.cassandra.UserEntity;
 import com.example.ums.entity.es.UserESEntity;
 import com.example.ums.exception.UmsException;
-import com.example.ums.model.PageResponse;
-import com.example.ums.model.UserHistoryResponse;
-import com.example.ums.model.UserResponse;
-import com.example.ums.model.UserRequest;
+import com.example.ums.model.*;
 import com.example.ums.repository.UserEsRepository;
 import com.example.ums.repository.UserRepository;
 import com.example.ums.service.UserService;
@@ -16,12 +13,16 @@ import com.example.ums.util.DateUtil;
 import com.example.ums.validator.UserValidator;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
+import org.springframework.data.cassandra.core.CassandraTemplate;
+import org.springframework.data.cassandra.core.query.CassandraPageRequest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -36,6 +37,9 @@ public class UserServiceImpl implements UserService {
     private UserValidator userValidator;
     @Autowired
     private KafkaProducerService kafkaProducerService;
+
+    @Autowired
+    private CassandraTemplate cassandraTemplate;
 
     @Transactional
     @Override
@@ -253,20 +257,39 @@ public class UserServiceImpl implements UserService {
         userEsRepository.deleteById(id);
     }
 
-    @Override
-    public PageResponse<UserHistoryResponse> getUserHistory(UUID id, int pageNo, int pageSize) {
-        Pageable pageable = PageRequest.of(pageNo, pageSize);
-        Page<UserESEntity> userPage = userEsRepository.findById(id, pageable);
+//    public PageResponse<UserHistoryResponse> getUserHistory(UUID id, CustomPageRequest request){
+//
+//        Pageable pageable = CassandraPageRequest.of(PageRequest.of(0, request.getPageSize()), StringUtils.isEmpty(request.getPageState())? null : ByteBuffer.wrap(request.getPageState().getBytes()));
+//
+//        Slice<UserEntity> userEntitySlice = userRepository.findById(id, pageable);
+//
+//        PageResponse<UserHistoryResponse> pageResponse = new PageResponse<>();
+//        List<UserHistoryResponse> userHistoryResponses = UserConverter.convertListToHistoryResponse(userEntitySlice.getContent());
+//        pageResponse.setList(userHistoryResponses);
+//
+//        if(userEntitySlice.isLast()) {
+//            pageResponse.setPageState(null);
+//        } else {
+//            pageResponse.setPageState(((CassandraPageRequest)userEntitySlice.getPageable()).getPagingState().toString());
+//        }
+//        return pageResponse;
+//    }
 
-        List<UserHistoryResponse> userHistoryResponses = UserConverter.convert(userPage.getContent());
+    public PageResponse<UserHistoryResponse> getUserHistory(UUID id, CustomPageRequest request){
+        int currpage = 0;
+        Slice<UserEntity> slice = userRepository.findById(id, CassandraPageRequest.first(request.getPageSize()));
+        while(currpage < request.getPageNo()) {
+            boolean hasNext = slice.hasNext();
+            if(!hasNext) return new PageResponse<>(null, null, 0, request.getPageNo(), new ArrayList<>());
+            slice = userRepository.findById(id, slice.nextPageable());
+            currpage++;
+        }
 
         PageResponse<UserHistoryResponse> pageResponse = new PageResponse<>();
-        pageResponse.pageNo(userPage.getNumber())
-                .totalPages(userPage.getTotalPages())
-                .totalCount(userPage.getTotalElements())
-                .list(userHistoryResponses)
-                .pageSize(pageResponse.getList().size());
-
+        List<UserHistoryResponse> userHistoryResponses = UserConverter.convertListToHistoryResponse(slice.getContent());
+        pageResponse.setList(userHistoryResponses);
+        pageResponse.setPageNo(request.getPageNo());
+        pageResponse.setPageSize(slice.getSize());
         return pageResponse;
     }
 }
