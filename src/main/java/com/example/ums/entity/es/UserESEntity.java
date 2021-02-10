@@ -1,9 +1,11 @@
 package com.example.ums.entity.es;
 
+import lombok.Data;
 import org.springframework.data.elasticsearch.annotations.Document;
 
 import java.util.UUID;
 
+@Data
 @Document(indexName = "user")
 public class UserESEntity {
 
@@ -25,4 +27,9 @@ public class UserESEntity {
 
     private Integer version;
 
+    private boolean isLatest;
+
+    private Long createdAt;
+
+    private Long updatedAt;
 }

@@ -58,10 +58,10 @@ public class CassandraConfig extends AbstractCassandraConfiguration {
                         + "password text,\n"
                         + "phone_no text,\n"
                         + "created_at bigint,\n"
-                        + "deleted boolean,\n"
+                        + "is_latest boolean,\n"
                         + "version int,\n"
                         + "updated_at bigint,\n"
-                        + "PRIMARY KEY((user_id, deleted), version)\n"
+                        + "PRIMARY KEY(id, version))\n"
                         + "WITH CLUSTERING ORDER BY (version DESC);");
         return session;
     }

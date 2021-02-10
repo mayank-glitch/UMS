@@ -2,7 +2,6 @@ package com.example.ums.model;
 
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.validation.annotation.Validated;
 
@@ -14,8 +13,8 @@ import org.springframework.validation.annotation.Validated;
 
 
 public class UserRequest   {
-  @JsonProperty("username")
-  private String username = null;
+  @JsonProperty("userName")
+  private String userName = null;
 
   @JsonProperty("firstName")
   private String firstName = null;
@@ -33,7 +32,7 @@ public class UserRequest   {
   private String phone = null;
 
   public UserRequest username(String username) {
-    this.username = username;
+    this.userName = username;
     return this;
   }
 
@@ -43,12 +42,12 @@ public class UserRequest   {
    **/
   @Schema(description = "")
   
-    public String getUsername() {
-    return username;
+    public String getUserName() {
+    return userName;
   }
 
-  public void setUsername(String username) {
-    this.username = username;
+  public void setUserName(String userName) {
+    this.userName = userName;
   }
 
   public UserRequest firstName(String firstName) {
@@ -156,7 +155,7 @@ public class UserRequest   {
       return false;
     }
     UserRequest userRequest = (UserRequest) o;
-    return Objects.equals(this.username, userRequest.username) &&
+    return Objects.equals(this.userName, userRequest.userName) &&
         Objects.equals(this.firstName, userRequest.firstName) &&
         Objects.equals(this.lastName, userRequest.lastName) &&
         Objects.equals(this.email, userRequest.email) &&
@@ -166,7 +165,7 @@ public class UserRequest   {
 
   @Override
   public int hashCode() {
-    return Objects.hash(username, firstName, lastName, email, password, phone);
+    return Objects.hash(userName, firstName, lastName, email, password, phone);
   }
 
   @Override
@@ -174,7 +173,7 @@ public class UserRequest   {
     StringBuilder sb = new StringBuilder();
     sb.append("class UserRequest {\n");
     
-    sb.append("    username: ").append(toIndentedString(username)).append("\n");
+    sb.append("    username: ").append(toIndentedString(userName)).append("\n");
     sb.append("    firstName: ").append(toIndentedString(firstName)).append("\n");
     sb.append("    lastName: ").append(toIndentedString(lastName)).append("\n");
     sb.append("    email: ").append(toIndentedString(email)).append("\n");

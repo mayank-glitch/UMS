@@ -5,12 +5,12 @@ import org.springframework.data.cassandra.core.cql.Ordering;
 import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
 import org.springframework.data.cassandra.core.mapping.Column;
 import org.springframework.data.cassandra.core.mapping.PrimaryKeyColumn;
+import org.springframework.data.cassandra.core.mapping.Table;
 
-import javax.persistence.Table;
 import java.util.UUID;
 
 @Data
-@Table(name = "user")
+@Table("users")
 public class UserEntity extends BaseEntity {
 
     @PrimaryKeyColumn(value = "id", ordinal = 0, type = PrimaryKeyType.PARTITIONED)
@@ -34,10 +34,10 @@ public class UserEntity extends BaseEntity {
     @Column(value = "password")
     private String password;
 
-    @PrimaryKeyColumn(value = "deleted", ordinal = 1, type = PrimaryKeyType.PARTITIONED)
-    private boolean deleted = false;
-
     @PrimaryKeyColumn(value = "version", ordinal = 2, type = PrimaryKeyType.CLUSTERED, ordering = Ordering.DESCENDING)
     private Integer version;
+
+    @Column(value = "is_latest")
+    private boolean isLatest;
 
 }

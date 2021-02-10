@@ -10,13 +10,6 @@ import java.util.UUID;
 
 public interface UserRepository extends CassandraRepository<UserEntity, UUID> {
 
-    UserEntity findFirstByIdAndDeletedFalse(UUID id);
+    UserEntity findFirstById(UUID id);
 
-    Page<UserEntity> findAllByIdAndDeletedFalse(UUID id, Pageable page);
-
-    UUID findTopIdByEmailAndDeletedFalse(String email);
-
-    UUID findTopIdByPhoneNoAndDeletedFalse(String phoneNo);
-
-    UUID findTopIdByUserNameAndDeletedFalse(String email);
 }
