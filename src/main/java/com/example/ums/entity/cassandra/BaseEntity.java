@@ -9,9 +9,9 @@ import java.util.UUID;
 public class BaseEntity {
 
     @Column(value = "created_at")
-    private Long created_at;
+    private Long createdAt;
 
     @Column(value = "updated_at")
-    private Long updated_at;
+    private Long updatedAt;
 
 }

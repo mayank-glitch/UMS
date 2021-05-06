@@ -25,11 +25,11 @@ public class UserHistoryResponse {
     return this;
   }
 
-  public UserResponse getUserBaseResponse() {
+  public UserResponse getUserResponse() {
     return userResponse;
   }
 
-  public void setUserBaseResponse(UserResponse userResponse) {
+  public void setUserResponse(UserResponse userResponse) {
     this.userResponse = userResponse;
   }
 

@@ -1,8 +1,10 @@
 package com.example.ums.validator;
 
 import com.example.ums.entity.cassandra.UserEntity;
+import com.example.ums.entity.es.UserESEntity;
 import com.example.ums.exception.UmsException;
 import com.example.ums.model.UserRequest;
+import com.example.ums.repository.UserEsRepository;
 import com.example.ums.repository.UserRepository;
 import lombok.NonNull;
 import org.apache.commons.lang3.StringUtils;
@@ -17,12 +19,14 @@ public class UserValidator {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private UserEsRepository userEsRepository;
 
     public void validateCreateUserRequest(UserRequest request) {
         if (Objects.isNull(request)) {
             throw new UmsException(UmsException.UmsExceptionEnum.PAYLOAD_EMPTY);
         }
-        if (StringUtils.isEmpty(request.getUsername())) {
+        if (StringUtils.isEmpty(request.getUserName())) {
             throw new UmsException(UmsException.UmsExceptionEnum.USER_NAME_EMPTY);
         }
         if (StringUtils.isEmpty(request.getPassword())) {
@@ -42,6 +46,22 @@ public class UserValidator {
         }
     }
 
+    public void validateDuplicateUser(UserRequest request){
+        UserESEntity userESEntity;
+        userESEntity = userEsRepository.findByUserNameAndIsLatest(request.getUserName(), true);
+        if(userESEntity!=null){
+            throw new UmsException(UmsException.UmsExceptionEnum.USER_NAME_ALREADY_EXIST);
+        }
+        userESEntity = userEsRepository.findByEmailAndIsLatest(request.getEmail(), true);
+        if(userESEntity != null){
+            throw new UmsException(UmsException.UmsExceptionEnum.EMAIL_ALREADY_EXIST);
+        }
+        userESEntity = userEsRepository.findByPhoneNoAndIsLatest(request.getPhone(), true);
+        if(userESEntity != null){
+            throw new UmsException(UmsException.UmsExceptionEnum.PHONE_NO_ALREADY_EXIST);
+        }
+    }
+
     public void validateUserId(UUID id) {
         if (id == null) {
             throw new UmsException(UmsException.UmsExceptionEnum.USER_ID_EMPTY);
@@ -58,22 +78,22 @@ public class UserValidator {
     }
 
     public void validateUpdateEmailRequest(UserEntity existingUser, @NonNull String email) {
-        UUID id = userRepository.findTopIdByEmailAndDeletedFalse(email);
-        if(id!=null && existingUser.getId() != id){
+        UserESEntity userESEntity = userEsRepository.findByEmailAndIsLatest(email, true);
+        if(userESEntity!=null && existingUser.getId() != userESEntity.getId()){
             throw new UmsException(UmsException.UmsExceptionEnum.EMAIL_ALREADY_EXIST);
         }
     }
 
     public void validateUpdateUserNameRequest(UserEntity existingUser, @NonNull String userName) {
-        UUID id = userRepository.findTopIdByUserNameAndDeletedFalse(userName);
-        if(id!=null && existingUser.getId() != id){
+        UserESEntity userESEntity = userEsRepository.findByUserNameAndIsLatest(userName, true);
+        if(userESEntity!=null && existingUser.getId() != userESEntity.getId()){
             throw new UmsException(UmsException.UmsExceptionEnum.EMAIL_ALREADY_EXIST);
         }
     }
 
     public void validateUpdatePhoneNoRequest(UserEntity existingUser, @NonNull String phoneNo) {
-        UUID id = userRepository.findTopIdByPhoneNoAndDeletedFalse(phoneNo);
-        if(id!=null && existingUser.getId() != id){
+        UserESEntity userESEntity = userEsRepository.findByPhoneNoAndIsLatest(phoneNo, true);
+        if(userESEntity!=null && existingUser.getId() != userESEntity.getId()){
             throw new UmsException(UmsException.UmsExceptionEnum.EMAIL_ALREADY_EXIST);
         }
     }
